@@ -13,7 +13,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(workers_bp, url_prefix='/worker')
 app.register_blueprint(recruiters_bp, url_prefix='/recruiter')
@@ -25,26 +24,30 @@ def index():
         return render_template('index.html', user=session.get('name'), role=session.get('role'))
     return render_template('index.html')
 
-
-# workers_bp aur recruiters_bp ko register karte waqt url_prefix mat do dashboard ke liye
-# Ya fir seedha main.py mein routes define karo
-
+# Dashboard routes DIRECTLY here (no prefix issue)
 @app.route('/worker-dashboard')
 def worker_dashboard():
     if 'user_id' not in session or session.get('role') != 'worker':
+        flash('Please login as worker', 'danger')
         return redirect(url_for('auth.login'))
     worker = Worker.query.filter_by(user_id=session['user_id']).first()
-    return render_template('worker-dashboard.html', name=session.get('name'), worker=worker)
+    if not worker:
+        flash('Profile incomplete', 'warning')
+        return redirect('/worker/profile')
+    return render_template('worker-dashboard.html', worker=worker, name=session.get('name'))
 
 @app.route('/recruiter-dashboard')
 def recruiter_dashboard():
     if 'user_id' not in session or session.get('role') != 'recruiter':
+        flash('Please login as recruiter', 'danger')
         return redirect(url_for('auth.login'))
     recruiter = Recruiter.query.filter_by(user_id=session['user_id']).first()
-    jobs = Job.query.filter_by(recruiter_id=recruiter.id).all() if recruiter else []
-    return render_template('recruiter-dashboard.html', name=session.get('name'), jobs=jobs)
+    if not recruiter:
+        flash('Profile incomplete', 'warning')
+        return redirect('/recruiter/profile')
+    jobs = Job.query.filter_by(recruiter_id=recruiter.id).all()
+    return render_template('recruiter-dashboard.html', jobs=jobs, name=session.get('name'))
 
-# Create tables (dev only)
 with app.app_context():
     db.create_all()
 
