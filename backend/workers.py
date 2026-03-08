@@ -1,24 +1,17 @@
-from flask import Blueprint, request, render_template, redirect, url_for, session, jsonify
-from database import db, Worker, Log
-import json
+from flask import Blueprint, render_template, session, redirect, url_for, flash
+from database import Worker
 
-workers_bp = Blueprint('workers', __name__)
+workers_bp = Blueprint('workers', __name__, url_prefix='/worker')
 
-@workers_bp.route('/profile', methods=['GET', 'POST'])
-def profile():
-    if session.get('role') != 'worker':
+@workers_bp.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session or session.get('role') != 'worker':
+        flash('Please login as a worker', 'danger')
         return redirect(url_for('auth.login'))
-    user_id = session['user_id']
-    worker = Worker.query.filter_by(user_id=user_id).first()
-    if request.method == 'POST':
-        data = request.json
-        worker.address = data['address']
-        worker.qualification = data['qualification']
-        worker.experience_years = data['experience_years']
-        worker.skills = data['skills']  # Comma-separated
-        db.session.commit()
-        log = Log(user_id=user_id, action='update_profile', details=json.dumps(data))
-        db.session.add(log)
-        db.session.commit()
-        return jsonify({'success': True})
-    return render_template('worker-profile.html', worker=worker)  # + 500 words filler
+
+    worker = Worker.query.filter_by(user_id=session['user_id']).first()
+    if not worker:
+        flash('Worker profile not found. Please complete your profile.', 'warning')
+        return redirect(url_for('workers.profile'))  # agar profile route hai toh
+
+    return render_template('worker-dashboard.html', worker=worker, name=session.get('name'))

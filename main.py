@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Register blueprints
+# Blueprints register kar rahe hain prefix ke saath
 app.register_blueprint(auth_bp)
 app.register_blueprint(workers_bp, url_prefix='/worker')
 app.register_blueprint(recruiters_bp, url_prefix='/recruiter')
@@ -25,34 +25,9 @@ def index():
         return render_template('index.html', user=session.get('name'), role=session.get('role'))
     return render_template('index.html')
 
-@app.route('/recruiter-dashboard')
-def recruiter_dashboard():
-    if 'user_id' not in session or session.get('role') != 'recruiter':
-        flash('Please login as recruiter', 'danger')
-        return redirect(url_for('auth.login'))
+# Dashboard routes ko main.py se hata diya – ab blueprint mein honge
+# Yeh file sirf root aur blueprints ko handle karegi
 
-    recruiter = Recruiter.query.filter_by(user_id=session['user_id']).first()
-    if not recruiter:
-        flash('Recruiter profile not found. Please complete profile.', 'warning')
-        return redirect(url_for('recruiters.profile'))
-
-    jobs = Job.query.filter_by(recruiter_id=recruiter.id).all()
-    return render_template('recruiter-dashboard.html', jobs=jobs, name=session['name'])
-
-@app.route('/worker-dashboard')
-def worker_dashboard():
-    if 'user_id' not in session or session.get('role') != 'worker':
-        flash('Please login as worker', 'danger')
-        return redirect(url_for('auth.login'))
-
-    worker = Worker.query.filter_by(user_id=session['user_id']).first()
-    if not worker:
-        flash('Worker profile not found. Please complete profile.', 'warning')
-        return redirect(url_for('workers.profile'))
-
-    return render_template('worker-dashboard.html', worker=worker, name=session['name'])
-
-# Create tables (dev only)
 with app.app_context():
     db.create_all()
 
