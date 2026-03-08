@@ -25,7 +25,7 @@ def index():
         return render_template('index.html', user=session.get('name'), role=session.get('role'))
     return render_template('index.html')
 
-@app.route('/recruiter/dashboard')
+@app.route('/recruiter-dashboard')
 def recruiter_dashboard():
     if 'user_id' not in session or session.get('role') != 'recruiter':
         flash('Please login as recruiter', 'danger')
@@ -39,7 +39,7 @@ def recruiter_dashboard():
     jobs = Job.query.filter_by(recruiter_id=recruiter.id).all()
     return render_template('recruiter-dashboard.html', jobs=jobs, name=session['name'])
 
-@app.route('/worker/dashboard')
+@app.route('/worker-dashboard')
 def worker_dashboard():
     if 'user_id' not in session or session.get('role') != 'worker':
         flash('Please login as worker', 'danger')
