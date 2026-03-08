@@ -1,0 +1,13 @@
+<div class="container py-5">
+    <h2>All Available Jobs</h2>
+    {% for job in jobs %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>{{ job.job_name }}</h5>
+            <p>{{ job.description }}</p>
+            <p>Location: {{ job.location }} | Salary: {{ job.salary }}</p>
+            <a href="#" class="btn btn-primary">Apply</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>

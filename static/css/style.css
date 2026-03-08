@@ -26,3 +26,10 @@ body {
     border-color: #ffc107;
     color: #000;
 }
+
+.bg-gradient-primary { background: linear-gradient(135deg, #007bff, #0056b3); }
+.role-btn { font-size: 2rem; transition: transform 0.3s; }
+.role-btn:hover { transform: scale(1.05); }
+.policy-section { max-height: 400px; overflow-y: auto; }
+.filler-section { font-size: 1.1em; line-height: 1.8; }
+@media (max-width: 768px) { .display-1 { font-size: 3rem; } }

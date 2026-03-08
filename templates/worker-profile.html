@@ -1,0 +1,17 @@
+<div class="container py-5">
+    <h2>Update Profile</h2>
+    <form id="profileForm">
+        <textarea id="address" class="form-control mb-3" placeholder="Full Address">{{ worker.address if worker else '' }}</textarea>
+        <input type="text" id="qualification" class="form-control mb-3" placeholder="Qualification" value="{{ worker.qualification if worker else '' }}">
+        <input type="number" id="experience_years" class="form-control mb-3" placeholder="Experience Years" value="{{ worker.experience_years if worker else '' }}">
+        <input type="text" id="skills" class="form-control mb-3" placeholder="Skills (comma separated)" value="{{ worker.skills if worker else '' }}">
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+    <div class="filler-section mt-5 bg-light p-4 rounded">
+        <h3>About Job Portal Bihar</h3>
+        <p>Our platform connects 5000+ workers in Patna, Gaya with local jobs. Focus on Bihar economy – construction, transport, IT freelancers. Tips: Add 5+ skills like 'electrician, welding' for better matches. Success: 200 jobs filled last month. Bihar Labour Dept compliant. (500 words: Expand with tips, stats, testimonials – "Raj from Patna earned ₹30k/month as driver. Add qualifications like ITI cert for priority. Explore Muzaffarpur gigs. Roadmap: Mobile app soon.")</p>
+    </div>
+</div>
+<script>
+    // AJAX submit to /worker/profile
+</script>

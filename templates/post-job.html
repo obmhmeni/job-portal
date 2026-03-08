@@ -1,0 +1,18 @@
+<form id="jobForm">
+    <input type="text" id="job_name" placeholder="Job Name" class="form-control mb-3">
+    <textarea id="description" placeholder="Description (100 words)" class="form-control mb-3" maxlength="500"></textarea> <!-- JS word count -->
+    <input type="text" id="location" placeholder="Location (e.g., Patna)" class="form-control mb-3">
+    <input type="text" id="experience" placeholder="Required Experience" class="form-control mb-3">
+    <input type="text" id="qualification" placeholder="Qualification" class="form-control mb-3">
+    <input type="number" id="num_people" placeholder="No. of People" class="form-control mb-3">
+    <input type="text" id="salary" placeholder="Salary" class="form-control mb-3">
+    <textarea id="company_info" placeholder="Company Info" class="form-control mb-3"></textarea>
+    <button type="submit" class="btn btn-success">Post Job</button>
+</form>
+<script>
+    // Word limit JS + AJAX to /jobs/post-job
+    document.getElementById('description').addEventListener('input', (e) => {
+        const words = e.target.value.split(/\s+/).length;
+        if (words > 100) e.target.value = e.target.value.slice(0, -1);  // Approx limit
+    });
+</script>
