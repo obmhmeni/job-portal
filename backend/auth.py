@@ -43,35 +43,46 @@ def login():
 
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
+    # Temp role role-select se aaya hai
     temp_role = session.get('temp_role', 'worker')
+
     if request.method == 'POST':
         data = request.json
         if not data:
-            return jsonify({'success': False, 'error': 'No data'}), 400
+            return jsonify({'success': False, 'error': 'No data received'}), 400
 
-        user = User(
-            name=data['name'],
-            email=data['email'],
-            phone=data['phone'],
-            state=data['state'],
-            role=temp_role
-        )
-        user.set_password(data['password'])
+        try:
+            user = User(
+                name=data['name'].strip(),
+                email=data['email'].strip(),
+                phone=data['phone'].strip(),
+                state=data['state'].strip(),
+                role=temp_role
+            )
+            user.set_password(data['password'])
 
-        db.session.add(user)
-        db.session.flush()
+            db.session.add(user)
+            db.session.flush()  # user.id mil jaye
 
-        if temp_role == 'worker':
-            db.session.add(Worker(user_id=user.id))
-        else:
-            db.session.add(Recruiter(user_id=user.id))
+            if temp_role == 'worker':
+                worker = Worker(user_id=user.id)
+                db.session.add(worker)
+            else:
+                recruiter = Recruiter(user_id=user.id)
+                db.session.add(recruiter)
 
-        db.session.commit()
+            db.session.commit()
 
-        session.pop('temp_role', None)
-        return jsonify({'success': True, 'redirect': url_for('auth.login')})
+            session.pop('temp_role', None)
 
+            return jsonify({
+                'success': True,
+                'redirect': url_for('auth.login')
+            })
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    # GET request - page dikhana
     return render_template('signup.html', role=temp_role)
-
-
-
