@@ -49,6 +49,7 @@ class Job(db.Model):
     company_info = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     recruiter = db.relationship('Recruiter', backref='jobs')
+    required_skills = db.Column(db.Text)
 
 class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,21 +1,149 @@
-<form id="jobForm">
-    <input type="text" id="job_name" placeholder="Job Name" class="form-control mb-3">
-    <textarea id="description" placeholder="Description (100 words)" class="form-control mb-3" maxlength="500"></textarea> <!-- JS word count -->
-    <input type="text" id="location" placeholder="Location (e.g., Patna)" class="form-control mb-3">
-    <input type="text" id="experience" placeholder="Required Experience" class="form-control mb-3">
-    <input type="text" id="qualification" placeholder="Qualification" class="form-control mb-3">
-    <input type="number" id="num_people" placeholder="No. of People" class="form-control mb-3">
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Job - Job Portal Bihar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/recruiter/dashboard">Back to Dashboard</a>
+        </div>
+    </nav>
 
-<input type="text" id="required_skills" class="form-control mb-3" placeholder="Required Skills (comma separated, e.g., masonry, welding, electrical wiring)" required>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white text-center fw-bold fs-4">
+                        Post a New Job Opportunity
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="jobPostForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Job Title / Position *</label>
+                                <input type="text" id="job_name" class="form-control" placeholder="e.g. Skilled Mason Required" required>
+                            </div>
 
-    <input type="text" id="salary" placeholder="Salary" class="form-control mb-3">
-    <textarea id="company_info" placeholder="Company Info" class="form-control mb-3"></textarea>
-    <button type="submit" class="btn btn-success">Post Job</button>
-</form>
-<script>
-    // Word limit JS + AJAX to /jobs/post-job
-    document.getElementById('description').addEventListener('input', (e) => {
-        const words = e.target.value.split(/\s+/).length;
-        if (words > 100) e.target.value = e.target.value.slice(0, -1);  // Approx limit
-    });
-</script>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Description (max 100 words) *</label>
+                                <textarea id="description" class="form-control" rows="5" placeholder="Job details, responsibilities, etc." required maxlength="600"></textarea>
+                                <small id="wordCount" class="text-muted">0 / 100 words</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Location *</label>
+                                    <input type="text" id="location" class="form-control" placeholder="e.g. Patna, Gaya" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Salary / Wage *</label>
+                                    <input type="text" id="salary" class="form-control" placeholder="e.g. ₹25,000/month or ₹900/day" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Required Experience</label>
+                                    <input type="text" id="required_experience" class="form-control" placeholder="e.g. 2+ years">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Required Qualification</label>
+                                    <input type="text" id="required_qualification" class="form-control" placeholder="e.g. ITI, 10th Pass">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Required Skills (comma separated) *</label>
+                                <input type="text" id="required_skills" class="form-control" placeholder="e.g. masonry, welding, electrical wiring, freelancing" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Number of People Needed *</label>
+                                    <input type="number" id="num_people" class="form-control" min="1" value="1" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Company / Individual Info</label>
+                                    <textarea id="company_info" class="form-control" rows="2" placeholder="Optional: Company name, contact info"></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-lg w-100 mt-3">
+                                <i class="fas fa-paper-plane me-2"></i>Post Job Now
+                            </button>
+                        </form>
+
+                        <div id="successMessage" class="alert alert-success mt-4 d-none">
+                            Job posted successfully! Redirecting to dashboard...
+                        </div>
+                        <div id="errorMessage" class="alert alert-danger mt-4 d-none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Word counter for description
+        const descInput = document.getElementById('description');
+        const wordCount = document.getElementById('wordCount');
+        descInput.addEventListener('input', () => {
+            const words = descInput.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            wordCount.textContent = `${words} / 100 words`;
+            if (words > 100) {
+                descInput.value = descInput.value.trim().split(/\s+/).slice(0, 100).join(' ');
+            }
+        });
+
+        // Form submit AJAX
+        document.getElementById('jobPostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                job_name: document.getElementById('job_name').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                location: document.getElementById('location').value.trim(),
+                salary: document.getElementById('salary').value.trim(),
+                required_experience: document.getElementById('required_experience').value.trim(),
+                required_qualification: document.getElementById('required_qualification').value.trim(),
+                required_skills: document.getElementById('required_skills').value.trim(),
+                num_people: parseInt(document.getElementById('num_people').value) || 1,
+                company_info: document.getElementById('company_info').value.trim()
+            };
+
+            if (!formData.job_name || !formData.description || !formData.location || !formData.salary || !formData.required_skills) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            try {
+                const res = await fetch('/jobs/post-job', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    document.getElementById('successMessage').classList.remove('d-none');
+                    setTimeout(() => {
+                        window.location.href = '/recruiter/dashboard';  // Redirect to dashboard
+                    }, 1500);
+                } else {
+                    document.getElementById('errorMessage').textContent = json.error || 'Failed to post job';
+                    document.getElementById('errorMessage').classList.remove('d-none');
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('errorMessage').textContent = 'Network error. Please try again.';
+                document.getElementById('errorMessage').classList.remove('d-none');
+            }
+        });
+    </script>
+</body>
+</html>
