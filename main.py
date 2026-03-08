@@ -17,6 +17,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(workers_bp, url_prefix='/worker')
 app.register_blueprint(recruiters_bp, url_prefix='/recruiter')
 app.register_blueprint(jobs_bp)
+app.register_blueprint(auth_bp)  # Yeh line honi chahiye – bina prefix ke
 
 @app.route('/')
 def index():

@@ -52,10 +52,29 @@
         </div>
     </div>
     <script>
-        function selectRole(role) {
-            fetch('/role-select', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({role})})
-            .then(res => res.json()).then(data => window.location.href = data.redirect);
+
+
+
+function selectRole(role) {
+    fetch('/role-select', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({role})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
+        } else {
+            window.location.href = '/signup';
         }
+    })
+    .catch(err => {
+        console.error(err);
+        window.location.href = '/signup';
+    });
+}
+
     </script>
 </body>
 </html>
