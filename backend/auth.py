@@ -1,6 +1,5 @@
 from flask import Blueprint, request, render_template, jsonify, session
 from database import db, User, Log
-from werkzeug.security import check_password_hash
 import json
 
 auth_bp = Blueprint('auth', __name__)
@@ -21,19 +20,19 @@ def login():
             session['role'] = user.role
             session['name'] = user.name
 
-            # Log (optional)
+            # Optional logging
             try:
                 log = Log(user_id=user.id, action='login', details=json.dumps({'method': email_or_phone}))
                 db.session.add(log)
                 db.session.commit()
             except:
-                db.session.rollback()
+                db.session.rollback()  # ignore log error
 
-            # Blueprint ke andar wale dashboard routes pe redirect
+            # Role ke hisaab se redirect URL decide karo
             if user.role == 'recruiter':
-                redirect_url = url_for('recruiters.dashboard')  # → /recruiter/dashboard
+                redirect_url = url_for('recruiter_dashboard')   # → /recruiter/dashboard
             else:
-                redirect_url = url_for('workers.dashboard')     # → /worker/dashboard
+                redirect_url = url_for('worker_dashboard')      # → /worker/dashboard
 
             return jsonify({
                 'success': True,

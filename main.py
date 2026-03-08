@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Blueprints register kar rahe hain prefix ke saath
+# Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(workers_bp, url_prefix='/worker')
 app.register_blueprint(recruiters_bp, url_prefix='/recruiter')
@@ -25,9 +25,26 @@ def index():
         return render_template('index.html', user=session.get('name'), role=session.get('role'))
     return render_template('index.html')
 
-# Dashboard routes ko main.py se hata diya – ab blueprint mein honge
-# Yeh file sirf root aur blueprints ko handle karegi
 
+# workers_bp aur recruiters_bp ko register karte waqt url_prefix mat do dashboard ke liye
+# Ya fir seedha main.py mein routes define karo
+
+@app.route('/worker-dashboard')
+def worker_dashboard():
+    if 'user_id' not in session or session.get('role') != 'worker':
+        return redirect(url_for('auth.login'))
+    worker = Worker.query.filter_by(user_id=session['user_id']).first()
+    return render_template('worker-dashboard.html', name=session.get('name'), worker=worker)
+
+@app.route('/recruiter-dashboard')
+def recruiter_dashboard():
+    if 'user_id' not in session or session.get('role') != 'recruiter':
+        return redirect(url_for('auth.login'))
+    recruiter = Recruiter.query.filter_by(user_id=session['user_id']).first()
+    jobs = Job.query.filter_by(recruiter_id=recruiter.id).all() if recruiter else []
+    return render_template('recruiter-dashboard.html', name=session.get('name'), jobs=jobs)
+
+# Create tables (dev only)
 with app.app_context():
     db.create_all()
 
