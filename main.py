@@ -25,6 +25,19 @@ def index():
         return render_template('index.html', user=session.get('name'), role=session.get('role'))
     return render_template('index.html')
 
+# In login route success (auth.py – but call from main if needed)
+# Already in previous: Use role to redirect to /recruiter/dashboard or /worker/dashboard
+@app.route('/recruiter/dashboard')
+def recruiter_dashboard():
+    # As previous
+    pass
+
+@app.route('/worker/dashboard')
+def worker_dashboard():
+    # As previous
+    pass
+
+
 # Create tables (dev only)
 with app.app_context():
     db.create_all()

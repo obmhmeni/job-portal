@@ -33,3 +33,14 @@ body {
 .policy-section { max-height: 400px; overflow-y: auto; }
 .filler-section { font-size: 1.1em; line-height: 1.8; }
 @media (max-width: 768px) { .display-1 { font-size: 3rem; } }
+
+
+.bg-gradient-primary { background: linear-gradient(135deg, #007bff, #0056b3); }
+.bg-gradient-success { background: linear-gradient(135deg, #28a745, #20c997); }
+.card { border: none; border-radius: 15px; overflow: hidden; transition: all 0.3s ease; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+.card-header { font-family: 'Poppins', sans-serif; font-size: 1.2rem; }
+.card-body p { font-size: 1.1rem; color: #555; }
+.sticky-top { position: sticky; top: 100px; z-index: 1020; }
+@media (max-width: 768px) { .container { padding: 10px; } .card-body { padding: 15px; } }
+
