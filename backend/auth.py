@@ -51,9 +51,23 @@ def login():
             session['user_id'] = user.id
             session['role'] = user.role
             session['name'] = user.name
+
+            # Log action
             log = Log(user_id=user.id, action='login', details=json.dumps({'method': data.get('email') or data.get('phone')}))
             db.session.add(log)
             db.session.commit()
-            return jsonify({'success': True, 'redirect': url_for('index'), 'name': user.name})
+
+            # Role-based redirect URL decide karo
+            if user.role == 'recruiter':
+                redirect_url = url_for('recruiter_dashboard')
+            else:
+                redirect_url = url_for('worker_dashboard')
+
+            return jsonify({
+                'success': True,
+                'redirect': redirect_url,
+                'name': user.name,
+                'role': user.role
+            })
         return jsonify({'error': 'Invalid credentials'})
     return render_template('login.html')

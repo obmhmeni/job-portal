@@ -55,4 +55,22 @@
         </div>
     </div>
 </body>
+
+<div id="welcomePopup" class="position-fixed top-50 start-50 translate-middle bg-success text-white p-4 rounded shadow-lg d-none" style="z-index: 9999; font-size: 1.5rem;">
+    Welcome back, <span id="welcomeName"></span>!
+</div>
+
+<script>
+    if (sessionStorage.getItem('justLoggedIn') === 'true') {
+        const popup = document.getElementById('welcomePopup');
+        document.getElementById('welcomeName').textContent = sessionStorage.getItem('welcomeName') || 'User';
+        popup.classList.remove('d-none');
+        setTimeout(() => {
+            popup.classList.add('d-none');
+            sessionStorage.removeItem('justLoggedIn');
+            sessionStorage.removeItem('welcomeName');
+        }, 3000);  // 3 seconds ke liye dikhe
+    }
+</script>
+
 </html>

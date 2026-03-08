@@ -25,18 +25,32 @@ def index():
         return render_template('index.html', user=session.get('name'), role=session.get('role'))
     return render_template('index.html')
 
-# In login route success (auth.py – but call from main if needed)
-# Already in previous: Use role to redirect to /recruiter/dashboard or /worker/dashboard
 @app.route('/recruiter/dashboard')
 def recruiter_dashboard():
-    # As previous
-    pass
+    if 'user_id' not in session or session.get('role') != 'recruiter':
+        flash('Please login as recruiter', 'danger')
+        return redirect(url_for('auth.login'))
+
+    recruiter = Recruiter.query.filter_by(user_id=session['user_id']).first()
+    if not recruiter:
+        flash('Recruiter profile not found. Please complete profile.', 'warning')
+        return redirect(url_for('recruiters.profile'))
+
+    jobs = Job.query.filter_by(recruiter_id=recruiter.id).all()
+    return render_template('recruiter-dashboard.html', jobs=jobs, name=session['name'])
 
 @app.route('/worker/dashboard')
 def worker_dashboard():
-    # As previous
-    pass
+    if 'user_id' not in session or session.get('role') != 'worker':
+        flash('Please login as worker', 'danger')
+        return redirect(url_for('auth.login'))
 
+    worker = Worker.query.filter_by(user_id=session['user_id']).first()
+    if not worker:
+        flash('Worker profile not found. Please complete profile.', 'warning')
+        return redirect(url_for('workers.profile'))
+
+    return render_template('worker-dashboard.html', worker=worker, name=session['name'])
 
 # Create tables (dev only)
 with app.app_context():
